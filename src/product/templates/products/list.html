@@ -17,7 +17,12 @@
             </div>
             <div class="col-md-2">
                 <select name="variant" id="" class="form-control">
-                    <option selected disabled>--Select A Variant--</option>
+                    {% for variant in variants %}
+                     {% for productvarient in variant.productvariant_set.all %}
+                        <option value="{{productvarient.id}}">{{productvarient.variant_title}}</option>
+                        {% endfor %}
+                    {% endfor %}
+                    <!-- <option selected disabled>--Select A Variant--</option> -->
 
                 </select>
             </div>
@@ -62,7 +67,7 @@
                     <td>{{ product.description }}</td>
                     <td>
                         <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
-                            {% for variant in product.productvariantprice_set.all %}   
+                            {% for variant in product.product_variants.all %}   
                             <dt class="col-sm-3 pb-0">
                                     {{variant.product_variant_one.variant_title}}/
                                     {{variant.product_variant_two.variant_title}}/
