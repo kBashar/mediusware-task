@@ -23,3 +23,11 @@ class ListProductView(generic.TemplateView):
         context['product'] = True
         # context['variants'] = list(variants.all())
         return context
+
+class ProductListView(generic.ListView):
+    model = Product
+    template_name = 'products/list.html'
+    context_object_name = 'products'
+    extra_context = {'product': True}
+    paginate_by = 2
+    
