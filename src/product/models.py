@@ -18,6 +18,7 @@ class Product(TimeStampMixin):
 class ProductImage(TimeStampMixin):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     file_path = models.URLField()
+    # TODO: add thumbnail field
 
 
 class ProductVariant(TimeStampMixin):
