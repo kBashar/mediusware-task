@@ -1,3 +1,4 @@
+import json
 from django.views import generic
 
 from product.models import (
@@ -18,6 +19,50 @@ class CreateProductView(generic.TemplateView):
         context["product"] = True
         context["variants"] = list(variants.all())
         return context
+
+    def post(self, request, *args, **kwargs):
+        product_data = json.loads(request.body)
+        print(product_data)
+        title = product_data.get("title", None)
+        sku = product_data.get('sku', None)
+        description = product_data.get("description", None)
+        product_variants = product_data.get("product_variant", None)
+        images = product_data.get("product_image", None)
+        prices = product_data.get("product_variant_prices", None)
+
+        _product = Product.objects.create(title=title, sku=sku, description=description)
+
+        # iterate over product_variant_price and get or create product_variant
+        variant_count = Variant.objects.count()
+        if prices:
+            for product_price in prices:
+                product_variant_tags = product_price.get("title").strip().split("/")[:3]
+                product_variants_array = [None, None, None, None]
+                for index, product_variant_tag in enumerate(product_variant_tags):
+                    variant = Variant.objects.get(
+                        id=product_variants[index].get("option")
+                    )
+                    product_variants_array[product_variants[index].get("option")] = ProductVariant.objects.get_or_create(
+                        product=_product,
+                        variant=variant,
+                        variant_title=product_variant_tag,
+                    )[0]
+                ProductVariantPrice.objects.create(
+                    product_variant_one = product_variants_array[0],
+                    product_variant_two = product_variants_array[1],
+                    product_variant_three = product_variants_array[2],
+
+                    price = product_price.get('price', 0),
+                    stock = product_price.get('stock', 0),
+
+                    product = _product
+                )
+
+        if images:
+            for image in images:
+                ProductImage.objects.create(product=_product, image=image)
+
+        return self.render_to_response(self.get_context_data())
 
 
 class ListProductView(generic.TemplateView):
